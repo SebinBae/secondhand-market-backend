@@ -45,7 +45,7 @@
 
 🆔ERD
 ---
-(docs/ERD final.jpg)
+[ERD](docs/ERD final.jpg)
 
 
 중고 거래 서비스의 핵심 도메인을 기준으로  
@@ -72,4 +72,4 @@
 🔧Trouble Shooting
 ---
 ---
-https://github.com/SebinBae/secondhand-market-backend/blob/main/TROUBLE_SHOOTING.md
+https://github.com/SebinBae/secondhand-market-backend/blob/main/docs/TROUBLE_SHOOTING.md
