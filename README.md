@@ -23,4 +23,4 @@
 ---
 
 ## Trouble Shooting
-[Trouble Shooting section!][src/]
+[Trouble Shooting section!][https://github.com/SebinBae/secondhand-market-backend/blob/main/TROUBLE_SHOOTING.md]
