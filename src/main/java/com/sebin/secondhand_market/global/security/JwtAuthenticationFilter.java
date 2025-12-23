@@ -22,14 +22,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtProvider jwtProvider;
   private final UserRepository userRepository;
 
+  private static final String BEARER_PREFIX = "Bearer ";
+  private static final int BEARER_PREFIX_LENGTH = 7;
+
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
     String header = request.getHeader("Authorization");
 
-    if (header != null && header.startsWith("Bearer ")) {
-      String token = header.substring(7);
+    if (header != null && header.startsWith(BEARER_PREFIX)) {
+      String token = header.substring(BEARER_PREFIX_LENGTH);
 
       if (jwtProvider.validate(token)) {
         UUID userId = jwtProvider.getUserId(token);

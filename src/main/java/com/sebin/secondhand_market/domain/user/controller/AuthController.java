@@ -2,6 +2,7 @@ package com.sebin.secondhand_market.domain.user.controller;
 
 import com.sebin.secondhand_market.domain.user.dto.request.LoginRequest;
 import com.sebin.secondhand_market.domain.user.dto.request.SignupRequest;
+import com.sebin.secondhand_market.domain.user.dto.response.SignUpResponse;
 import com.sebin.secondhand_market.domain.user.dto.response.TokenResponse;
 import com.sebin.secondhand_market.domain.user.service.UserService;
 import jakarta.validation.Valid;
@@ -21,9 +22,16 @@ public class AuthController {
   private final UserService userService;
 
   @PostMapping("/signup")
-  public ResponseEntity<Map<String, String>> signup(@RequestBody @Valid SignupRequest signupRequest) {
+  public ResponseEntity<SignUpResponse> signup(@RequestBody @Valid SignupRequest signupRequest) {
     userService.signup(signupRequest);
-    return ResponseEntity.ok(Map.of("status", "200", "message", "회원가입 성공!", "email", signupRequest.getEmail()));
+
+    SignUpResponse response = new SignUpResponse(
+        "200",
+        "회원 가입이 성공적으로 동작했습니다!",
+        signupRequest.getEmail()
+    );
+
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping("/login")
