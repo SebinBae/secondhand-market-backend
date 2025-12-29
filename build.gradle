@@ -14,6 +14,12 @@ java {
 	}
 }
 
+def querydslDir = "src/main/generated"
+
+sourceSets {
+	main.java.srcDirs += [ querydslDir ]
+}
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -31,6 +37,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
+
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
@@ -43,8 +50,18 @@ dependencies {
 
 	// ✅ Swagger UI (Spring Boot 3.x)
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.withType(JavaCompile).configureEach {
+	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+clean.doLast {
+	file(querydslDir).deleteDir()
+}
+

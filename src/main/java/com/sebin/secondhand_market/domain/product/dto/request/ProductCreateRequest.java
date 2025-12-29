@@ -1,4 +1,4 @@
-package com.sebin.secondhand_market.domain.product.dto;
+package com.sebin.secondhand_market.domain.product.dto.request;
 
 import com.sebin.secondhand_market.domain.product.type.ProductCategory;
 import jakarta.validation.constraints.Min;
