@@ -4,6 +4,7 @@ import com.sebin.secondhand_market.domain.user.entity.UserEntity;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +27,10 @@ public class UserPrincipal implements UserDetails {
   @Override
   public String getUsername() {
     return user.getEmail();
+  }
+
+  public UUID getUserId(){
+    return user.getId();
   }
 
   @Override

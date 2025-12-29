@@ -26,7 +26,7 @@ public class AuthController {
     userService.signup(signupRequest);
 
     SignUpResponse response = new SignUpResponse(
-        "200",
+        "201",
         "회원 가입이 성공적으로 동작했습니다!",
         signupRequest.getEmail()
     );

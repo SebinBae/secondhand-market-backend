@@ -9,10 +9,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class JwtProvider {
 
   private static final long TOKEN_EXPIRED_TIME = 1000 * 60 * 20; // 유효 시간 : 20분!
@@ -37,7 +39,7 @@ public class JwtProvider {
   public boolean validate(String token) {
 
     try {
-      Jwts.parser().setSigningKey(this.secretKey).build().parseClaimsJwt(token);
+      Jwts.parser().setSigningKey(this.secretKey).build().parseClaimsJws(token);
       return true;
     } catch (JwtException | IllegalArgumentException e) {
       return false;

@@ -39,3 +39,4 @@ out/
 ### application.properties ###
 resources/application.properties
 resources/application-local.properties
+
