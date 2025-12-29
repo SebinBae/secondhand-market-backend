@@ -8,6 +8,7 @@ import com.sebin.secondhand_market.global.security.UserPrincipal;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,7 +36,7 @@ public class ProductController {
     UUID productId = productService.create(request, userPrincipal.getUserId());
 
     ProductCreatedResponse response = new ProductCreatedResponse(
-        "201",
+        HttpStatus.CREATED,
         "상품이 성공적으로 등록완료 되었습니다!",
         productId
     );
@@ -52,7 +53,7 @@ public class ProductController {
     productService.update(productId, request, userPrincipal.getUserId());
 
     ProductCreatedResponse response = new ProductCreatedResponse(
-        "200",
+        HttpStatus.OK,
         "상품이 성공적으로 수정되었습니다!",
         productId
     );
@@ -81,7 +82,7 @@ public class ProductController {
     productService.changeStatus(productId, request.getProductStatus(), userPrincipal.getUserId());
 
     ProductCreatedResponse response = new ProductCreatedResponse(
-        "200",
+        HttpStatus.OK,
         "상품 상태가 성공적으로 수정되었습니다!",
         productId
     );
