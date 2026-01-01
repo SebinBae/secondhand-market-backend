@@ -1,23 +1,33 @@
 package com.sebin.secondhand_market.domain.product.controller;
 
 import com.sebin.secondhand_market.domain.product.dto.request.ProductCreateRequest;
+import com.sebin.secondhand_market.domain.product.dto.request.ProductSearchRequest;
 import com.sebin.secondhand_market.domain.product.dto.request.ProductStatusChangeRequest;
 import com.sebin.secondhand_market.domain.product.dto.response.ProductCreatedResponse;
+import com.sebin.secondhand_market.domain.product.dto.response.ProductResponse;
+import com.sebin.secondhand_market.domain.product.service.ProductReadService;
 import com.sebin.secondhand_market.domain.product.service.ProductService;
+import com.sebin.secondhand_market.domain.product.type.ProductSortType;
+import com.sebin.secondhand_market.domain.product.type.ProductStatus;
+import com.sebin.secondhand_market.global.common.PageResponse;
 import com.sebin.secondhand_market.global.security.UserPrincipal;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController {
 
   private final ProductService productService;
+  private final ProductReadService productReadService;
 
   // 상품 등록
   @PostMapping
@@ -88,6 +99,23 @@ public class ProductController {
     );
 
     return ResponseEntity.ok(response);
+  }
+
+  // 상품 검색
+  @GetMapping
+  public ResponseEntity<PageResponse<ProductResponse>> search(
+      @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) ProductStatus status,
+      @RequestParam(required = false) ProductSortType sortType,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size
+  ) {
+    ProductSearchRequest request = new ProductSearchRequest(keyword, status, sortType);
+
+    Page<ProductResponse> responses = productReadService.search(request, page, size)
+        .map(ProductResponse::from);
+
+    return ResponseEntity.ok(PageResponse.from(responses));
   }
 
 }
