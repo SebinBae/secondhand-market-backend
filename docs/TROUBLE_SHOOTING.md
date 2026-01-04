@@ -1,18 +1,15 @@
 # Trouble Shooting
 프로젝트를 진행하면서 발생한 문제점들과 해결법 서술합니다.
 
+## io.jsonwebtoken.Jwts 클래스
+토큰을 검증(Parsing)하는 과정에서 Jwts 클래스의 내부 메소드인 parseClaimsJws()와 parseClaimsJwt() 차이를 착각하여 페이로드 검증에 통과하여도 토큰 검증에 실패하는 문제점이 발생했었습니다. 
+
+parseClaimsJws() 메소드 : 서명이 적용된 JWT를 파싱할 때 사용하는 메소드
+parseClaimsJwt() 메소드 : 서명이 적용되지 않은 JWT를 파싱할 때 사용하는 메소드
+
 ## Spring Boot 3.x와 Querydsl
+Spring Boot 2.x에서 Querydsl을 세팅하여 사용하다가 Spring Boot 3.x에서 Querydsl을 세팅하여
+사용하니 다음과 같은 차이점이 있었습니다.
 
-
-## N+1 문제점
-처음 프로젝트 설계시 게시판 글 조회 시 댓글 목록도 함께 조회를 하고자 하였습니다. 그러자 한번 게시글 조회시 해당 게시글에 작성된 모든 댓글들도 함께 조회가 되었습니다.
-그리고 이 부분들이 한번에 조회된 것이 아닌,
-- 게시글 조회 : 게시글에 작성된 댓글의 id가 함께 조회
-- 각 댓글 조회 : 게시글 조회시 조회된 댓글 id를 통해 댓글 각각 조회
-  즉 댓글 갯수만큼의 조회가 더 발생하게 되었습니다. 이를 해결하고자 다음의 방법을 사용 & 시도해보았습니다
-
-1. native query 작성
-   ...
-
-2. API 분리
-   ...
++ build.gradle 설정 차이
++ Querydsl이 생성하는 Q클래스가 Spring Boot 3.x에서는 jakarta 기반으로 변경되었음.

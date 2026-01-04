@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -16,6 +17,7 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @Table(name = "users")
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserEntity extends BaseEntity {
 
   @Id

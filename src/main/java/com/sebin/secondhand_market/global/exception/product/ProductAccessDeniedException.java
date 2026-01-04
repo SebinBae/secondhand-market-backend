@@ -1,4 +1,4 @@
-package com.sebin.secondhand_market.global.exception.user;
+package com.sebin.secondhand_market.global.exception.product;
 
 import com.sebin.secondhand_market.global.exception.BusinessException;
 import com.sebin.secondhand_market.global.exception.ErrorCode;
