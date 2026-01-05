@@ -2,6 +2,9 @@ package com.sebin.secondhand_market.domain.chat.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sebin.secondhand_market.domain.chat.dto.request.ChatMessageSendRequest;
 import com.sebin.secondhand_market.domain.chat.dto.response.ChatMessageResponse;
 import com.sebin.secondhand_market.domain.chat.entity.ChatRoomEntity;
@@ -13,12 +16,10 @@ import com.sebin.secondhand_market.domain.product.type.ProductStatus;
 import com.sebin.secondhand_market.domain.user.entity.UserEntity;
 import com.sebin.secondhand_market.domain.user.repository.UserRepository;
 import com.sebin.secondhand_market.global.security.JwtProvider;
-import com.sebin.secondhand_market.support.TestJwtHelper;
 import java.lang.reflect.Type;
-import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,21 +27,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.messaging.converter.DefaultContentTypeResolver;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles("local")
 public class ChatWebSocketTest {
 
-  @Autowired TestJwtHelper testJwtHelper;
   @Autowired ChatRoomRepository chatRoomRepository;
   @Autowired UserRepository userRepository;
   @Autowired ProductRepository productRepository;
@@ -50,10 +53,9 @@ public class ChatWebSocketTest {
   int port;
 
   // 테스트를 위해 브라우저 대신 WebSocket + STOMP 자체로 접속하는 클라이언트
-  WebSocketStompClient stompClient;
+  WebSocketStompClient stompClient = createStompClient();
 
   UUID roomId;
-  UUID senderId;
   UUID buyerId;
   UUID sellerId;
   UUID productId;
@@ -62,14 +64,12 @@ public class ChatWebSocketTest {
 
   @BeforeEach
   void setUp(){
-    stompClient = new WebSocketStompClient(new StandardWebSocketClient());
-    // JSON <-> Java 객체 자동 변환
-    stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+    stompClient = createStompClient();
 
     // 1. 유저 생성
     UserEntity seller = userRepository.save(
         new UserEntity(
-        "codus@test.com",
+        "codus@testtest.com",
         "codus",
         "판매자")
     );
@@ -77,7 +77,7 @@ public class ChatWebSocketTest {
 
     UserEntity buyer = userRepository.save(
       new UserEntity(
-       "sedus@test.com",
+       "sedus@testtest.com",
           "sedus",
           "세빈배"
       )
@@ -87,9 +87,9 @@ public class ChatWebSocketTest {
     // 2. 제품 생성
     ProductEntity product = productRepository.save(
       new ProductEntity(
-          "아이폰 18",
+          "아이폰 20",
           10000000,
-          "급전이 필요하여 판매합니다.",
+          "급전이 필요하여 판매합니다. 판매합니다.",
           ProductCategory.DIGITAL,
           ProductStatus.SELLING,
           seller
@@ -125,12 +125,26 @@ public class ChatWebSocketTest {
         url,
         webSocketHttpHeaders,
         stompHeaders,
-        new StompSessionHandlerAdapter() {}
+        new StompSessionHandlerAdapter() {
+
+          @Override
+          public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload,
+              Throwable exception) {
+            System.err.println("STOMP handleException: cmd=" + command + ", headers=" + headers);
+            exception.printStackTrace();
+          }
+
+          @Override
+          public void handleTransportError(StompSession session, Throwable exception) {
+            System.err.println("STOMP transportError:");
+            exception.printStackTrace();
+          }
+        }
     ).get(3,TimeUnit.SECONDS);
 
-    CompletableFuture<ChatMessageResponse> future = new CompletableFuture<>();
+    BlockingQueue<ChatMessageResponse> queue =
+        new LinkedBlockingQueue<>();
 
-    //subscribe
     session.subscribe("/topic/chat." + roomId, new StompFrameHandler() {
       @Override
       public Type getPayloadType(StompHeaders headers) {
@@ -139,24 +153,49 @@ public class ChatWebSocketTest {
 
       @Override
       public void handleFrame(StompHeaders headers, Object payload) {
-        future.complete((ChatMessageResponse) payload);
+        queue.offer((ChatMessageResponse) payload);
       }
     });
+
+    // 클라이언트 subscribe / publish 간에 타이밍 이슈로 인해 잠깐 정지
+    Thread.sleep(200);
 
     // send
     StompHeaders sendHeaders = new StompHeaders();
     sendHeaders.setDestination("/app/chat.send");
     sendHeaders.add("Authorization", "Bearer " + token);
+    sendHeaders.setContentType(MimeTypeUtils.APPLICATION_JSON);
 
     session.send(sendHeaders, new ChatMessageSendRequest(roomId, "hello websocket!"));
 
     //then
-    ChatMessageResponse response = future.get(5, TimeUnit.SECONDS);
+    ChatMessageResponse response = queue.poll(5, TimeUnit.SECONDS);
+    assertThat(response).isNotNull();
     assertThat(response.getRoomId()).isEqualTo(roomId);
     assertThat(response.getContent()).isEqualTo("hello websocket!");
 
   }
 
+  private WebSocketStompClient createStompClient() {
+    //  클라이언트를 가정한 코드
+    WebSocketStompClient stompclient = new WebSocketStompClient(new StandardWebSocketClient());
 
+    // 직렬화 관련 코드 추가
+    MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+
+    ObjectMapper om = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    // 클라이언트의 헤더에 contentType : Application/Json 추가
+    DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
+    resolver.setDefaultMimeType(MimeTypeUtils.APPLICATION_JSON);
+    converter.setContentTypeResolver(resolver);
+
+    converter.setObjectMapper(om);
+    stompclient.setMessageConverter(converter);
+
+    return stompclient;
+  }
 
 }

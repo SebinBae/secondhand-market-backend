@@ -28,7 +28,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   @Override
   public void configureMessageBroker(MessageBrokerRegistry registry) {
-    // 클라이언트가 /topic/** 을 구독하면 simpleBroker 가 구독한 모든 클라이언트에게 전달
+    // 클라이언트가 구독 경로 -> simpleBroker 가 구독한 모든 클라이언트에게 전달
     registry.enableSimpleBroker("/topic");
 
     // client -> server 메시지를 SEND 하면 @MessageMapping 메소드로 전달됨.
