@@ -38,6 +38,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll().requestMatchers(
                 "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html"
             ).permitAll()
+            .requestMatchers("/ws-chat/**").permitAll()
             .anyRequest().authenticated())
         // 필터 위치 조정
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

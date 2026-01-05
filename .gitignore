@@ -39,4 +39,5 @@ out/
 ### application.properties ###
 resources/application.properties
 resources/application-local.properties
+resources/application-test.properties
 

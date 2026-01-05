@@ -28,6 +28,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private static final int BEARER_PREFIX_LENGTH = 7;
 
   @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    return request.getRequestURI().startsWith("/ws-chat");
+  }
+
+  @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 

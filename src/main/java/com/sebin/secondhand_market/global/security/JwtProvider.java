@@ -7,10 +7,13 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -52,6 +55,16 @@ public class JwtProvider {
         .build()
         .parseClaimsJws(token)
         .getBody().getSubject());
+  }
+
+  public Authentication getAuthentication(String token) {
+    UUID userId = getUserId(token);
+
+    return new UsernamePasswordAuthenticationToken(userId.toString(),
+        null,
+        Collections.emptyList()
+    );
+
   }
 
 }

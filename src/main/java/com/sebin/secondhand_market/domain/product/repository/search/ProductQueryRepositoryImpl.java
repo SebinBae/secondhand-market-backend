@@ -31,7 +31,7 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository {
         selectFrom(product)
         .where(
             titleContains(request.getKeyword())
-            ,statusEq(request.getResolvedStatus())
+            , statusEq(request.getResolvedStatus())
         )
         .orderBy(sortCondition(request.getProductSortType()))
         .offset(pageable.getOffset())
