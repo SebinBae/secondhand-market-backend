@@ -10,6 +10,7 @@ import com.sebin.secondhand_market.domain.user.repository.UserRepository;
 import com.sebin.secondhand_market.global.exception.trade.ChatRoomAccessDeniedException;
 import com.sebin.secondhand_market.global.exception.trade.ChatRoomNotFoundException;
 import com.sebin.secondhand_market.global.exception.trade.SenderNotFoundException;
+import com.sebin.secondhand_market.global.websocket.StompDestination;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -51,7 +52,7 @@ public class ChatMessageService {
     room.updateLastMessageTime();
 
     messagingTemplate.convertAndSend(
-        "/topic/chat." + roomId,
+        StompDestination.chatRoom(roomId),
         ChatMessageResponse.from(message)
     );
   }

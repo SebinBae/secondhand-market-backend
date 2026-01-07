@@ -7,17 +7,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sebin.secondhand_market.domain.chat.dto.request.ChatMessageSendRequest;
 import com.sebin.secondhand_market.domain.chat.dto.response.ChatMessageResponse;
-import com.sebin.secondhand_market.domain.chat.entity.ChatRoomEntity;
 import com.sebin.secondhand_market.domain.chat.repository.ChatRoomRepository;
-import com.sebin.secondhand_market.domain.product.entity.ProductEntity;
 import com.sebin.secondhand_market.domain.product.repository.ProductRepository;
-import com.sebin.secondhand_market.domain.product.type.ProductCategory;
-import com.sebin.secondhand_market.domain.product.type.ProductStatus;
-import com.sebin.secondhand_market.domain.user.entity.UserEntity;
 import com.sebin.secondhand_market.domain.user.repository.UserRepository;
 import com.sebin.secondhand_market.global.security.JwtProvider;
-import com.sebin.secondhand_market.global.websocket.StompAppDestination;
-import com.sebin.secondhand_market.global.websocket.StompDestination;
 import com.sebin.secondhand_market.global.websocket.WebSocketEndpoint;
 import java.lang.reflect.Type;
 import java.util.UUID;
@@ -44,7 +37,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class ChatWebSocketTest {
+public class ChatHistoryTest {
 
   @Autowired
   ChatRoomRepository chatRoomRepository;
@@ -71,45 +64,10 @@ public class ChatWebSocketTest {
   void setUp() {
     stompClient = createStompClient();
 
-    // 1. 유저 생성
-    UserEntity seller = userRepository.save(
-        new UserEntity(
-            "codus@testtesttest.com",
-            "codus",
-            "판매자")
-    );
-    sellerId = seller.getId();
-
-    UserEntity buyer = userRepository.save(
-        new UserEntity(
-            "sedus@testtesttest.com",
-            "sedus",
-            "세빈배"
-        )
-    );
-    buyerId = buyer.getId();
-
-    // 2. 제품 생성
-    ProductEntity product = productRepository.save(
-        new ProductEntity(
-            "아이폰 21",
-            10000000,
-            "급전이 필요하여 판매합니다. 판매합니다.",
-            ProductCategory.DIGITAL,
-            ProductStatus.SELLING,
-            seller
-        )
-    );
-    productId = product.getId();
-
-    // 3. 채팅방 생성
-    ChatRoomEntity room = chatRoomRepository.save(
-        new ChatRoomEntity(
-            product,
-            seller,
-            buyer)
-    );
-    roomId = room.getId();
+    roomId = UUID.fromString("60497f5e-d09c-4ed3-88de-94a2c686fb87");
+    buyerId = UUID.fromString("c2f49beb-6e79-4b52-822a-bd058ce062b7");
+    sellerId = UUID.fromString("26a0f1a2-dcb5-4668-9dcd-1ad95280e155");
+    productId = UUID.fromString("21b641f6-721c-4232-b27a-8007d8e21871");
   }
 
   @Test
@@ -119,8 +77,8 @@ public class ChatWebSocketTest {
      * Given
      * Websocket + STOMP 클라이언트가 준비되어 있고 특정 판매자가 jwt 토큰으로 인증되어 있으며
      * 이미 존재하는 채팅방이 있고, 해당 채팅방의 topic 을 구독할 준비가 되어 있음.
+     * POSTMAN(REST API) 을 통해 생성한 roomId, buyerId, sellerId, productId의 ID가 준비되어 있음.
      */
-
     String token = jwtProvider.createToken(sellerId);
 
     // WebSocket handshake를 위한 url
@@ -156,7 +114,7 @@ public class ChatWebSocketTest {
     BlockingQueue<ChatMessageResponse> queue =
         new LinkedBlockingQueue<>();
 
-    session.subscribe(StompDestination.chatRoom(roomId), new StompFrameHandler() {
+    session.subscribe("/topic/chat." + roomId, new StompFrameHandler() {
       @Override
       public Type getPayloadType(StompHeaders headers) {
         return ChatMessageResponse.class;
@@ -176,23 +134,23 @@ public class ChatWebSocketTest {
      * /app/chat.send 엔드포인트로 채팅방 ID와 메시지 내용을 담아 STOMP 메시지를 publish 함.
      */
     StompHeaders sendHeaders = new StompHeaders();
-    sendHeaders.setDestination("/app" + StompAppDestination.CHAT_SEND);
+    sendHeaders.setDestination("/app/chat.send");
     sendHeaders.add("Authorization", "Bearer " + token);
     sendHeaders.setContentType(MimeTypeUtils.APPLICATION_JSON);
 
-    session.send(sendHeaders, new ChatMessageSendRequest(roomId, "hello websocket!"));
+    session.send(sendHeaders, new ChatMessageSendRequest(roomId, "넵! 가능합니다!"));
 
     /*
      * then
      * 1. 구독중이던 클라이언트가 받은 메시지가 null 아니어야 함.
      * 2. 메시지의 RoomId가 채팅방 roomId와 동일해야 함.
      * 3. 다른 채팅방 클라이언트가 서버로 보낸 메시지가 클라이언트가 받은 메시지와 동일해야 함.
+     * 4. POSTMAN(REST API) 으로 chat message 확인함.
      */
-    //then
     ChatMessageResponse response = queue.poll(5, TimeUnit.SECONDS);
     assertThat(response).isNotNull();
     assertThat(response.getRoomId()).isEqualTo(roomId);
-    assertThat(response.getContent()).isEqualTo("hello websocket!");
+    assertThat(response.getContent()).isEqualTo("넵! 가능합니다!");
 
   }
 
@@ -217,5 +175,4 @@ public class ChatWebSocketTest {
 
     return stompclient;
   }
-
 }

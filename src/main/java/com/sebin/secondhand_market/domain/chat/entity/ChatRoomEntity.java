@@ -70,6 +70,7 @@ public class ChatRoomEntity {
     room.seller = seller;
     room.buyer = buyer;
     room.lastMessageAt = LocalDateTime.now();
+    room.createdAt = LocalDateTime.now();
 
     return room;
   }

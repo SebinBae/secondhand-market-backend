@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatMessageController {
 
   private final ChatMessageService chatMessageService;
+  private static final String SORT_BY_CREATED_AT = "createdAt";
 
   @GetMapping
   public Page<ChatMessageResponse> messages(
@@ -32,7 +33,7 @@ public class ChatMessageController {
       @RequestParam(defaultValue = "20") int size,
       @AuthenticationPrincipal UserPrincipal principal
   ) {
-    Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+    Pageable pageable = PageRequest.of(page, size, Sort.by(SORT_BY_CREATED_AT).ascending());
 
     return chatMessageService.getMessages(
         roomId,
