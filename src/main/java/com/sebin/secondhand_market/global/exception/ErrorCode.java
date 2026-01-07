@@ -19,7 +19,9 @@ public enum ErrorCode {
   INVALID_CHAT_TARGET(HttpStatus.BAD_REQUEST, "자신의 상품에는 채팅할 수 없습니다."),
   CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "채팅방이 존재하지 않습니다."),
   CHATROOM_ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "채팅방 접근 권한이 없습니다."),
-  SENDER_NOT_FOUND(HttpStatus.NOT_FOUND, "채팅방 참가자를 찾을 수 없습니다.");
+  SENDER_NOT_FOUND(HttpStatus.NOT_FOUND, "채팅방 참가자를 찾을 수 없습니다."),
+
+  UNAUTHENTICATED_STOMP_USER(HttpStatus.UNAUTHORIZED,"인증되지 않는 STOMP 사용자(Principal) 입니다.");
 
   private final HttpStatus status;
   private final String message;

@@ -11,6 +11,7 @@ import com.sebin.secondhand_market.domain.chat.repository.ChatRoomRepository;
 import com.sebin.secondhand_market.domain.product.repository.ProductRepository;
 import com.sebin.secondhand_market.domain.user.repository.UserRepository;
 import com.sebin.secondhand_market.global.security.JwtProvider;
+import com.sebin.secondhand_market.global.websocket.WebSocketEndpoint;
 import java.lang.reflect.Type;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -36,7 +37,6 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("local")
 public class ChatHistoryTest {
 
   @Autowired
@@ -61,7 +61,7 @@ public class ChatHistoryTest {
   private JwtProvider jwtProvider;
 
   @BeforeEach
-  void setUp(){
+  void setUp() {
     stompClient = createStompClient();
 
     roomId = UUID.fromString("60497f5e-d09c-4ed3-88de-94a2c686fb87");
@@ -71,12 +71,18 @@ public class ChatHistoryTest {
   }
 
   @Test
-  void sendMessageAndAfterSubscribe() throws Exception{
+  void sendMessageAndAfterSubscribe() throws Exception {
 
+    /*
+     * Given
+     * Websocket + STOMP 클라이언트가 준비되어 있고 특정 판매자가 jwt 토큰으로 인증되어 있으며
+     * 이미 존재하는 채팅방이 있고, 해당 채팅방의 topic 을 구독할 준비가 되어 있음.
+     * POSTMAN(REST API) 을 통해 생성한 roomId, buyerId, sellerId, productId의 ID가 준비되어 있음.
+     */
     String token = jwtProvider.createToken(sellerId);
 
     // WebSocket handshake를 위한 url
-    String url = "ws://localhost:" + port + "/ws-chat";
+    String url = "ws://localhost:" + port + WebSocketEndpoint.CHAT;
 
     WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
     webSocketHttpHeaders.add("Authorization", "Bearer " + token);
@@ -84,7 +90,7 @@ public class ChatHistoryTest {
     StompHeaders stompHeaders = new StompHeaders();
     stompHeaders.add("Authorization", "Bearer " + token);
 
-    StompSession session =stompClient.connectAsync(
+    StompSession session = stompClient.connectAsync(
         url,
         webSocketHttpHeaders,
         stompHeaders,
@@ -123,7 +129,10 @@ public class ChatHistoryTest {
     // 클라이언트 subscribe / publish 간에 타이밍 이슈로 인해 잠깐 정지
     Thread.sleep(200);
 
-    // send
+    /*
+     * when
+     * /app/chat.send 엔드포인트로 채팅방 ID와 메시지 내용을 담아 STOMP 메시지를 publish 함.
+     */
     StompHeaders sendHeaders = new StompHeaders();
     sendHeaders.setDestination("/app/chat.send");
     sendHeaders.add("Authorization", "Bearer " + token);
@@ -131,7 +140,13 @@ public class ChatHistoryTest {
 
     session.send(sendHeaders, new ChatMessageSendRequest(roomId, "넵! 가능합니다!"));
 
-    //then
+    /*
+     * then
+     * 1. 구독중이던 클라이언트가 받은 메시지가 null 아니어야 함.
+     * 2. 메시지의 RoomId가 채팅방 roomId와 동일해야 함.
+     * 3. 다른 채팅방 클라이언트가 서버로 보낸 메시지가 클라이언트가 받은 메시지와 동일해야 함.
+     * 4. POSTMAN(REST API) 으로 chat message 확인함.
+     */
     ChatMessageResponse response = queue.poll(5, TimeUnit.SECONDS);
     assertThat(response).isNotNull();
     assertThat(response.getRoomId()).isEqualTo(roomId);
