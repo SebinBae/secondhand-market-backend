@@ -1,10 +1,18 @@
-# build(Gradle + Corretto 21)
+# build stage
 FROM gradle:8.5-jdk21 AS builder
 WORKDIR /app
-COPY . .
-RUN gradle clean build -x test
 
-# execute(Amazon Corretto 21 JRE)
+COPY build.gradle settings.gradle gradlew ./
+COPY gradle ./gradle
+
+RUN gradle dependencies --no-daemon
+
+COPY src ./src
+
+# build
+RUN gradle build -x test --no-daemon
+
+# runtime stage
 FROM amazoncorretto:21
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
