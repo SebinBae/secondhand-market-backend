@@ -9,6 +9,8 @@ RUN gradle dependencies --no-daemon
 
 COPY src ./src
 
+RUN gradle clean build -x test --no-daemon
+
 # build
 RUN gradle build -x test --no-daemon
 
