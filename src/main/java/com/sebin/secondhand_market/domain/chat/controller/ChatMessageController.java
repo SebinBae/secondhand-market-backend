@@ -3,6 +3,7 @@ package com.sebin.secondhand_market.domain.chat.controller;
 import com.sebin.secondhand_market.domain.chat.dto.response.ChatMessageResponse;
 import com.sebin.secondhand_market.domain.chat.service.ChatMessageService;
 import com.sebin.secondhand_market.global.security.UserPrincipal;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ public class ChatMessageController {
   private final ChatMessageService chatMessageService;
   private static final String SORT_BY_CREATED_AT = "createdAt";
 
+  @Operation(summary = "WebSocket 과정에서 발생된 DB에 저장된 메시지 조회")
   @GetMapping
   public Page<ChatMessageResponse> messages(
       @PathVariable UUID roomId,
