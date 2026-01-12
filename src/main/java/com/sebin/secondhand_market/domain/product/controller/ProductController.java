@@ -11,6 +11,7 @@ import com.sebin.secondhand_market.domain.product.type.ProductSortType;
 import com.sebin.secondhand_market.domain.product.type.ProductStatus;
 import com.sebin.secondhand_market.global.common.PageResponse;
 import com.sebin.secondhand_market.global.security.UserPrincipal;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +40,7 @@ public class ProductController {
   private final ProductReadService productReadService;
 
   // 상품 등록
+  @Operation(summary = "상품 등록")
   @PostMapping
   public ResponseEntity<ProductCreatedResponse> create(
       @RequestBody @Valid ProductCreateRequest request,
@@ -56,6 +58,7 @@ public class ProductController {
   }
 
   // 상품 수정
+  @Operation(summary = "상품 수정")
   @PutMapping("/{productId}")
   public ResponseEntity<ProductCreatedResponse> update(
       @PathVariable UUID productId,
@@ -73,6 +76,7 @@ public class ProductController {
   }
 
   // 상품 삭제
+  @Operation(summary = "상품 삭제")
   @DeleteMapping("/{productId}")
   public ResponseEntity<Void> delete(
       @PathVariable UUID productId,
@@ -84,6 +88,7 @@ public class ProductController {
   }
 
   // 상품 상태 변경
+  @Operation(summary = "상품 상태 변경")
   @PatchMapping("/{productId}/status")
   public ResponseEntity<ProductCreatedResponse> changeStatus(
       @PathVariable UUID productId,
@@ -102,6 +107,7 @@ public class ProductController {
   }
 
   // 상품 검색
+  @Operation(summary = "상품 검색")
   @GetMapping
   public ResponseEntity<PageResponse<ProductResponse>> search(
       @RequestParam(required = false) String keyword,

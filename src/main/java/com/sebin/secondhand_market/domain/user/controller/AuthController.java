@@ -5,6 +5,7 @@ import com.sebin.secondhand_market.domain.user.dto.request.SignupRequest;
 import com.sebin.secondhand_market.domain.user.dto.response.SignUpResponse;
 import com.sebin.secondhand_market.domain.user.dto.response.TokenResponse;
 import com.sebin.secondhand_market.domain.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class AuthController {
 
   private final UserService userService;
 
+  @Operation(summary = "유저 회원가입")
   @PostMapping("/signup")
   public ResponseEntity<SignUpResponse> signup(@RequestBody @Valid SignupRequest signupRequest) {
     userService.signup(signupRequest);
@@ -34,6 +36,7 @@ public class AuthController {
     return ResponseEntity.ok(response);
   }
 
+  @Operation(summary = "유저 로그인")
   @PostMapping("/login")
   public ResponseEntity<TokenResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
     String token = userService.login(loginRequest);

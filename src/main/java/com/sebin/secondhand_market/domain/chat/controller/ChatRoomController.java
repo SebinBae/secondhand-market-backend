@@ -4,6 +4,7 @@ import com.sebin.secondhand_market.domain.chat.dto.request.ChatRoomCreateRequest
 import com.sebin.secondhand_market.domain.chat.dto.response.ChatRoomResponse;
 import com.sebin.secondhand_market.domain.chat.service.ChatRoomService;
 import com.sebin.secondhand_market.global.security.UserPrincipal;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,7 @@ public class ChatRoomController {
   private final ChatRoomService chatRoomService;
 
   // 채팅방 생성 또는 조회
+  @Operation(summary = "채팅방 생성 또는 조회")
   @PostMapping
   public ChatRoomResponse createRoom(
       @RequestBody ChatRoomCreateRequest request,
@@ -37,6 +39,7 @@ public class ChatRoomController {
   }
 
   // 유저 채팅 목록 조회
+  @Operation(summary = "유저 채팅 목록 조회")
   @GetMapping
   public Page<ChatRoomResponse> myRooms(
       @RequestParam(defaultValue = "0") int page,

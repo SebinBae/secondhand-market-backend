@@ -54,6 +54,11 @@
 - 상품과 구매자 기준으로 채팅방이 생성됩니다.
 - 동일 상품에 대해 동일 구매자는 하나의 채팅방만 생성할 수 있습니다.
 
+♦️ AWS 아키텍처 다이어그램
+---
+---
+![DIAGRAM](Diagram.jpg)
+
 🛠 기술 스택
 ---
 ---
@@ -67,6 +72,8 @@
 - QueryDSL
 - MySQL 
 - Gradle
+- Docker
+- AWS(VPC, EC2)
 
 🔧Trouble Shooting
 ---
