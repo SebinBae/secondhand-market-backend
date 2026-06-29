@@ -1,0 +1,46 @@
+package com.sebin.secondhand_market.domain.chat.controller;
+
+import com.sebin.secondhand_market.domain.chat.dto.response.ChatMessageResponse;
+import com.sebin.secondhand_market.domain.chat.service.ChatMessageService;
+import com.sebin.secondhand_market.global.security.UserPrincipal;
+import io.swagger.v3.oas.annotations.Operation;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/chat-rooms/{roomId}/messages")
+@PreAuthorize("isAuthenticated()")
+@RequiredArgsConstructor
+public class ChatMessageController {
+
+  private final ChatMessageService chatMessageService;
+  private static final String SORT_BY_CREATED_AT = "createdAt";
+
+  @Operation(summary = "WebSocket 과정에서 발생된 DB에 저장된 메시지 조회")
+  @GetMapping
+  public Page<ChatMessageResponse> messages(
+      @PathVariable UUID roomId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "20") int size,
+      @AuthenticationPrincipal UserPrincipal principal
+  ) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(SORT_BY_CREATED_AT).ascending());
+
+    return chatMessageService.getMessages(
+        roomId,
+        principal.getUserId(),
+        pageable
+    );
+  }
+}
