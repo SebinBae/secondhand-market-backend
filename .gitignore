@@ -8,6 +8,7 @@ Thumbs.db
 # Claude Code project instructions (local only, not for remote)
 CLAUDE.md
 **/CLAUDE.md
+.claude/commands/notion-log.md
 
 # Local docs (not for remote)
 docs/
