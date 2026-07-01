@@ -1,0 +1,12 @@
+# WSL2 artifacts (NTFS alternate data streams)
+*:Zone.Identifier
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Frontend (React)
+frontend/node_modules/
+frontend/.next/
+frontend/dist/
+frontend/build/
