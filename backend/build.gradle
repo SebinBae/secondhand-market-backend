@@ -66,6 +66,9 @@ dependencies {
 	// ✅ Spring WebSocket + STOMP
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+	// ✅ Redis (Refresh Token / Access Token 블랙리스트)
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	// ✅ 테스트 DB (H2)
 	testRuntimeOnly 'com.h2database:h2'
 

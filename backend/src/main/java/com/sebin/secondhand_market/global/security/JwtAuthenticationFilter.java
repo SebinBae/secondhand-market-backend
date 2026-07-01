@@ -21,6 +21,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtProvider jwtProvider;
   private final UserRepository userRepository;
+  private final TokenRedisService tokenRedisService;
 
   private static final String BEARER_PREFIX = "Bearer ";
   private static final int BEARER_PREFIX_LENGTH = 7;
@@ -39,7 +40,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     if (header != null && header.startsWith(BEARER_PREFIX)) {
       String token = header.substring(BEARER_PREFIX_LENGTH);
 
-      if (jwtProvider.validate(token)) {
+      if (jwtProvider.validate(token) && jwtProvider.isAccessToken(token)
+          && !tokenRedisService.isAccessTokenBlacklisted(token)) {
 
         UUID userId = jwtProvider.getUserId(token);
 
@@ -48,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         UserPrincipal principal = new UserPrincipal(user);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-            principal, null, principal.getAuthorities());
+            principal, token, principal.getAuthorities());
 
         SecurityContextHolder.getContext()
             .setAuthentication(authentication);

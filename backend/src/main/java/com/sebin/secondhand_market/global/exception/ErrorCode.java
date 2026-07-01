@@ -11,6 +11,8 @@ public enum ErrorCode {
   EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원이 존재하지 않습니다."),
   INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+  INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
+  REFRESH_TOKEN_REUSED(HttpStatus.UNAUTHORIZED, "토큰 재사용이 감지되어 세션이 종료되었습니다. 다시 로그인해주세요."),
 
   PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품이 존재하지 않습니다."),
   PRODUCT_ACCESS_DENIED(HttpStatus.FORBIDDEN, "상품 수정 권한이 없습니다."),
