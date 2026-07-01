@@ -5,6 +5,13 @@
 .DS_Store
 Thumbs.db
 
+# Claude Code project instructions (local only, not for remote)
+CLAUDE.md
+**/CLAUDE.md
+
+# Local docs (not for remote)
+docs/
+
 # Frontend (React)
 frontend/node_modules/
 frontend/.next/
