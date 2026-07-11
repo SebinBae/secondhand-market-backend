@@ -44,6 +44,7 @@ public class JwtProvider {
     Date expiredDate = new Date(now.getTime() + expiredTime);
 
     return Jwts.builder()
+        .setId(UUID.randomUUID().toString())
         .setSubject(userId.toString())
         .claim(CLAIM_TYPE, type)
         .setIssuedAt(now)
