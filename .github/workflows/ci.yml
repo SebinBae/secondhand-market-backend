@@ -13,6 +13,18 @@ jobs:
       run:
         working-directory: backend
 
+    # AuthFlowIntegrationTest가 실제 Redis를 사용 (localhost:6379)
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
     steps:
       - name: 체크아웃
         uses: actions/checkout@v4
@@ -28,6 +40,9 @@ jobs:
 
       - name: 빌드 및 테스트 (ArchUnit 경계 검사 포함)
         run: ./gradlew build
+        env:
+          # CI 전용 임의 값 — 운영 시크릿과 무관, 테스트 컨텍스트 로딩용
+          JWT_SECRET: ci-only-jwt-secret-0123456789abcdef0123456789abcdef0123456789abcdef
 
       - name: 실패 시 테스트 리포트 업로드
         if: failure()
