@@ -35,7 +35,9 @@ public class SecurityConfig {
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-        .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll().requestMatchers(
+        .authorizeHttpRequests(auth -> auth.requestMatchers(
+                "/api/auth/signup", "/api/auth/login", "/api/auth/reissue"
+            ).permitAll().requestMatchers(
                 "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html"
             ).permitAll()
             .requestMatchers("/ws-chat/**").permitAll()

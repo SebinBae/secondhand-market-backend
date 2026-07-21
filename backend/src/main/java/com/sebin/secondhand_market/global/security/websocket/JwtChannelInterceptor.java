@@ -35,7 +35,6 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
       if(accessor.getUser()!= null) return message;
 
       String authHeader = accessor.getFirstNativeHeader("Authorization");
-      log.info("CONNECT auth={}", accessor.getFirstNativeHeader("Authorization"));
 
       if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
         String token = authHeader.substring(BEARER_PREFIX_LENGTH);

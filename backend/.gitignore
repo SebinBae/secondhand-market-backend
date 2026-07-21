@@ -22,6 +22,7 @@ src/main/generated/
 ### Secrets & environment ###
 .env
 .env.*
+!.env.example
 **/resources/application-local.properties
 **/resources/application-test.properties
 **/resources/application-prod.properties
