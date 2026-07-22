@@ -7,8 +7,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sebin.secondhand_market.domain.chat.dto.request.ChatMessageSendRequest;
 import com.sebin.secondhand_market.domain.chat.dto.response.ChatMessageResponse;
+import com.sebin.secondhand_market.domain.chat.entity.ChatRoomEntity;
 import com.sebin.secondhand_market.domain.chat.repository.ChatRoomRepository;
+import com.sebin.secondhand_market.domain.product.entity.ProductEntity;
 import com.sebin.secondhand_market.domain.product.repository.ProductRepository;
+import com.sebin.secondhand_market.domain.product.type.ProductCategory;
+import com.sebin.secondhand_market.domain.product.type.ProductStatus;
+import com.sebin.secondhand_market.domain.user.entity.UserEntity;
 import com.sebin.secondhand_market.domain.user.repository.UserRepository;
 import com.sebin.secondhand_market.global.security.JwtProvider;
 import com.sebin.secondhand_market.global.websocket.WebSocketEndpoint;
@@ -64,10 +69,22 @@ public class ChatHistoryTest {
   void setUp() {
     stompClient = createStompClient();
 
-    roomId = UUID.fromString("60497f5e-d09c-4ed3-88de-94a2c686fb87");
-    buyerId = UUID.fromString("c2f49beb-6e79-4b52-822a-bd058ce062b7");
-    sellerId = UUID.fromString("26a0f1a2-dcb5-4668-9dcd-1ad95280e155");
-    productId = UUID.fromString("21b641f6-721c-4232-b27a-8007d8e21871");
+    UserEntity seller = userRepository.save(
+            new UserEntity("history-seller@testtesttest.com", "hseller", "판매자"));
+    sellerId = seller.getId();
+
+    UserEntity buyer = userRepository.save(
+            new UserEntity("history-buyer@testtesttest.com", "hbuyer", "구매자"));
+    buyerId = buyer.getId();
+
+    ProductEntity product = productRepository.save(
+            new ProductEntity("아이폰 21", 10000000, "판매합니다.",
+                    ProductCategory.DIGITAL, ProductStatus.SELLING, seller));
+    productId = product.getId();
+
+    ChatRoomEntity room = chatRoomRepository.save(
+            new ChatRoomEntity(product, seller, buyer));
+    roomId = room.getId();
   }
 
   @Test
