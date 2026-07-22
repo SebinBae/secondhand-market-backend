@@ -41,8 +41,8 @@ jobs:
       - name: 빌드 및 테스트 (ArchUnit 경계 검사 포함)
         run: ./gradlew build
         env:
-          # CI 전용 임의 값 — 운영 시크릿과 무관, 테스트 컨텍스트 로딩용
-          JWT_SECRET: ci-only-jwt-secret-0123456789abcdef0123456789abcdef0123456789abcdef
+          # CI 전용 임의 값 (유효한 Base64여야 함 — JwtProvider가 Base64로 디코딩) — 운영 시크릿과 무관
+          JWT_SECRET: FRJGH3k0dpXlAmprRZkYiOVqwkRh9K+4gQOlWqiNWCW5XoKmmiZS/XLVNpELDpLelILBNkPB2ycnIvYV8GvvBw==
 
       - name: 실패 시 테스트 리포트 업로드
         if: failure()
