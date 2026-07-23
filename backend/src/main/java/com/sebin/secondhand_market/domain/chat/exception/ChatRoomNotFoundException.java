@@ -1,4 +1,4 @@
-package com.sebin.secondhand_market.global.exception.trade;
+package com.sebin.secondhand_market.domain.chat.exception;
 
 import com.sebin.secondhand_market.global.exception.BusinessException;
 import com.sebin.secondhand_market.global.exception.ErrorCode;

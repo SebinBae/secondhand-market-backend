@@ -2,7 +2,7 @@ package com.sebin.secondhand_market.domain.chat.controller;
 
 import com.sebin.secondhand_market.domain.chat.dto.request.ChatMessageSendRequest;
 import com.sebin.secondhand_market.domain.chat.service.ChatMessageService;
-import com.sebin.secondhand_market.global.exception.trade.StompAuthenticationRequiredException;
+import com.sebin.secondhand_market.domain.chat.exception.StompAuthenticationRequiredException;
 import com.sebin.secondhand_market.global.websocket.StompAppDestination;
 import java.security.Principal;
 import java.util.UUID;
