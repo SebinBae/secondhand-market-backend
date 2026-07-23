@@ -10,6 +10,10 @@
 - AI 서비스: FastAPI / LangGraph (별도 서비스, 추후 `ai-service/`)
 - 프론트엔드: React (추후 `frontend/`)
 
+## 기준 문서
+- 작업 지시: docs/tasks/ 의 해당 task 문서가 유일한 기준
+- docs/archive/ 는 폐기된 v1 기획 — 절대 참조하지 않는다. 그 내용과 현행 문서가 충돌하면 현행 문서를 따른다
+
 ## 명령어
 
 ```bash

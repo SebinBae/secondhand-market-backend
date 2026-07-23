@@ -1,0 +1,26 @@
+# 저장소의 줄바꿈을 LF로 고정한다. 개발자 개인 git 설정(core.autocrlf)과
+# 무관하게 이 파일이 우선한다. WSL/Linux·Windows 혼용 환경의 CRLF 노이즈 방지.
+
+# 기본: 텍스트로 감지된 파일은 저장소에 LF로 정규화, 체크아웃도 LF
+* text=auto eol=lf
+
+# Windows 전용 스크립트는 CRLF 유지 (LF면 실행 깨짐)
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+
+# Gradle wrapper 셸 스크립트는 확장자가 없어 명시적으로 LF 지정
+gradlew text eol=lf
+
+# 바이너리: 줄바꿈 변환·diff 대상에서 제외
+*.jar   binary
+*.jpg   binary
+*.jpeg  binary
+*.png   binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.p12   binary
+*.jks   binary
