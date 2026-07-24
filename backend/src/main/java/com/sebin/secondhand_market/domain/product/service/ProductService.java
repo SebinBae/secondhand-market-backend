@@ -2,6 +2,7 @@ package com.sebin.secondhand_market.domain.product.service;
 
 import com.sebin.secondhand_market.domain.product.dto.request.ProductCreateRequest;
 import com.sebin.secondhand_market.domain.product.entity.ProductEntity;
+import com.sebin.secondhand_market.domain.product.event.ProductCreatedEvent;
 import com.sebin.secondhand_market.domain.product.repository.ProductRepository;
 import com.sebin.secondhand_market.domain.product.type.ProductStatus;
 import com.sebin.secondhand_market.domain.user.entity.UserEntity;
@@ -9,8 +10,10 @@ import com.sebin.secondhand_market.domain.user.service.UserService;
 import com.sebin.secondhand_market.domain.product.exception.ProductAccessDeniedException;
 import com.sebin.secondhand_market.domain.product.exception.ProductNotFoundException;
 import com.sebin.secondhand_market.domain.user.exception.UserNotFoundException;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ public class ProductService {
 
   private final ProductRepository productRepository;
   private final UserService userService;
+  private final ApplicationEventPublisher eventPublisher;
 
   // 상품 등록 처리
   public UUID create(ProductCreateRequest request, UUID userId) {
@@ -37,7 +41,17 @@ public class ProductService {
         seller
     );
 
-    return productRepository.save(product).getId();
+    ProductEntity saved = productRepository.save(product);
+
+    // 저장 성공 후 이벤트 발행 — 실제 수신은 커밋 이후(AFTER_COMMIT)
+    eventPublisher.publishEvent(new ProductCreatedEvent(
+        saved.getId(),
+        seller.getId(),
+        saved.getTitle(),
+        Instant.now()
+    ));
+
+    return saved.getId();
 
   }
 
