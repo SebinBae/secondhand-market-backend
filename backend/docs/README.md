@@ -75,6 +75,19 @@
 - Docker
 - AWS(VPC, EC2)
 
+📦 이미지 저장소 (Supabase Storage) 선택 근거
+---
+---
+배포 대상인 Render 무료 티어는 컨테이너 디스크가 휘발성이라, 서버 로컬에 업로드 파일을 두면 재배포·재시작 시 사라진다. 따라서 상품 이미지는 외부 오브젝트 스토리지에 저장해야 한다.
+
+여러 후보(AWS S3, Cloudflare R2, 자체 호스팅 MinIO) 중 **Supabase Storage**를 택한 이유:
+- 무료 티어에서 S3 호환 오브젝트 스토리지를 제공하고, **REST API만으로 업로드**가 가능해 무거운 벤더 SDK 의존성 없이 Spring `RestClient`만으로 연동된다(신규 의존성 0).
+- 프로덕션 DB(PostgreSQL)를 Supabase로 통합하면 스토리지·DB 벤더를 하나로 관리할 수 있어 운영 포인트가 준다.
+
+**벤더 종속을 피하기 위해** 애플리케이션은 `ImageStorage` 인터페이스에만 의존하고, Supabase는 그 구현체 하나(`SupabaseImageStorage`)로 격리했다. S3·R2 등으로 교체할 때 구현체만 추가하면 되고 서비스/컨트롤러/엔티티/테스트는 바뀌지 않는다.
+
+객체 키는 추측 불가능한 UUID로 생성하고, 접속 정보(URL/Service Key)는 `.env`로만 주입한다(코드·저장소에 시크릿 미포함). 버킷 접근 정책(공개 읽기 vs 서명 URL)은 별도 보안 검토 대상이다.
+
 🔧Trouble Shooting
 ---
 ---
