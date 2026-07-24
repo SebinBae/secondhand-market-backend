@@ -18,8 +18,6 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @Getter
 @NoArgsConstructor
@@ -30,8 +28,6 @@ public class ProductEntity extends BaseEntity {
 
   @Id
   @GeneratedValue
-  @JdbcTypeCode(SqlTypes.BINARY)
-  @Column(columnDefinition = "BINARY(16)")
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
