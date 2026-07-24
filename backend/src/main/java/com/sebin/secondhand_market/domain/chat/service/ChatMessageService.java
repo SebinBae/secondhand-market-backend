@@ -6,7 +6,7 @@ import com.sebin.secondhand_market.domain.chat.entity.ChatRoomEntity;
 import com.sebin.secondhand_market.domain.chat.repository.ChatMessageRepository;
 import com.sebin.secondhand_market.domain.chat.repository.ChatRoomRepository;
 import com.sebin.secondhand_market.domain.user.entity.UserEntity;
-import com.sebin.secondhand_market.domain.user.repository.UserRepository;
+import com.sebin.secondhand_market.domain.user.service.UserService;
 import com.sebin.secondhand_market.domain.chat.exception.ChatRoomAccessDeniedException;
 import com.sebin.secondhand_market.domain.chat.exception.ChatRoomNotFoundException;
 import com.sebin.secondhand_market.domain.chat.exception.SenderNotFoundException;
@@ -26,7 +26,7 @@ public class ChatMessageService {
 
   private final ChatRoomRepository chatRoomRepository;
   private final ChatMessageRepository chatMessageRepository;
-  private final UserRepository userRepository;
+  private final UserService userService;
   private final SimpMessagingTemplate messagingTemplate;
 
   /**
@@ -42,7 +42,7 @@ public class ChatMessageService {
       throw new ChatRoomAccessDeniedException();
     }
 
-    UserEntity sender = userRepository.findById(senderId)
+    UserEntity sender = userService.findById(senderId)
         .orElseThrow(SenderNotFoundException::new);
 
     ChatMessageEntity message = new ChatMessageEntity(room, sender, content);

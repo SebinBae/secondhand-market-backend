@@ -5,7 +5,7 @@ import com.sebin.secondhand_market.domain.product.entity.ProductEntity;
 import com.sebin.secondhand_market.domain.product.repository.ProductRepository;
 import com.sebin.secondhand_market.domain.product.type.ProductStatus;
 import com.sebin.secondhand_market.domain.user.entity.UserEntity;
-import com.sebin.secondhand_market.domain.user.repository.UserRepository;
+import com.sebin.secondhand_market.domain.user.service.UserService;
 import com.sebin.secondhand_market.domain.product.exception.ProductAccessDeniedException;
 import com.sebin.secondhand_market.domain.product.exception.ProductNotFoundException;
 import com.sebin.secondhand_market.domain.user.exception.UserNotFoundException;
@@ -20,11 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
 
   private final ProductRepository productRepository;
-  private final UserRepository userRepository;
+  private final UserService userService;
 
   // 상품 등록 처리
   public UUID create(ProductCreateRequest request, UUID userId) {
-    UserEntity seller = userRepository.findById(userId).orElseThrow(
+    UserEntity seller = userService.findById(userId).orElseThrow(
         UserNotFoundException::new
     );
 
