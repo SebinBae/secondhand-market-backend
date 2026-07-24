@@ -75,6 +75,19 @@
 - Docker
 - AWS(VPC, EC2)
 
+📦 이미지 저장소 (Supabase Storage) 선택 근거
+---
+---
+배포 대상인 Render 무료 티어는 컨테이너 디스크가 휘발성이라, 서버 로컬에 업로드 파일을 두면 재배포·재시작 시 사라진다. 따라서 상품 이미지는 외부 오브젝트 스토리지에 저장해야 한다.
+
+여러 후보(AWS S3, Cloudflare R2, 자체 호스팅 MinIO) 중 **Supabase Storage**를 택한 이유:
+- 무료 티어에서 S3 호환 오브젝트 스토리지를 제공하고, **REST API만으로 업로드**가 가능해 무거운 벤더 SDK 의존성 없이 Spring `RestClient`만으로 연동된다(신규 의존성 0).
+- 프로덕션 DB(PostgreSQL)를 Supabase로 통합하면 스토리지·DB 벤더를 하나로 관리할 수 있어 운영 포인트가 준다.
+
+**벤더 종속을 피하기 위해** 애플리케이션은 `ImageStorage` 인터페이스에만 의존하고, Supabase는 그 구현체 하나(`SupabaseImageStorage`)로 격리했다. S3·R2 등으로 교체할 때 구현체만 추가하면 되고 서비스/컨트롤러/엔티티/테스트는 바뀌지 않는다.
+
+**접근 정책**: 상품 사진은 본질적으로 로그인 없이 노출되는 공개 콘텐츠이므로, 버킷은 **공개 읽기(public read)**로 두어 안정적 URL·CDN 캐싱 이점을 취한다. 대신 열거(enumeration)를 막기 위해 **① 객체 키를 추측 불가능한 UUID로 생성**하고 **② 객체 목록 조회(LIST)를 비활성화**한다(익명 키에 storage LIST 권한을 부여하지 않음). 쓰기는 서버가 보유한 **service_role 키로만** 수행하며, 접속 정보(URL/Service Key)는 `.env`로만 주입한다(코드·저장소에 시크릿 미포함). 신분증·비공개 문서처럼 접근 제어가 필요한 파일이 생기면 그때 해당 용도의 버킷만 private + 서명 URL로 분리한다.
+
 🔧Trouble Shooting
 ---
 ---

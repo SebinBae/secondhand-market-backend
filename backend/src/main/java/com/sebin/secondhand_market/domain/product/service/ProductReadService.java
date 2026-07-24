@@ -1,6 +1,7 @@
 package com.sebin.secondhand_market.domain.product.service;
 
 import com.sebin.secondhand_market.domain.product.dto.request.ProductSearchRequest;
+import com.sebin.secondhand_market.domain.product.dto.response.ProductDetailResponse;
 import com.sebin.secondhand_market.domain.product.entity.ProductEntity;
 import com.sebin.secondhand_market.domain.product.exception.ProductNotFoundException;
 import com.sebin.secondhand_market.domain.product.repository.ProductRepository;
@@ -32,5 +33,13 @@ public class ProductReadService {
   public ProductEntity getProductById(UUID productId) {
     return productRepository.findById(productId)
         .orElseThrow(ProductNotFoundException::new);
+  }
+
+  // 상품 상세 조회 — 이미지 URL 포함. 단건이라 images 지연 로딩은 N+1 아님.
+  @Transactional(readOnly = true)
+  public ProductDetailResponse getProductDetail(UUID productId) {
+    ProductEntity product = productRepository.findById(productId)
+        .orElseThrow(ProductNotFoundException::new);
+    return ProductDetailResponse.from(product);
   }
 }
