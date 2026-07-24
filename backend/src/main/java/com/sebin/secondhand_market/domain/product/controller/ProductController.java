@@ -4,7 +4,10 @@ import com.sebin.secondhand_market.domain.product.dto.request.ProductCreateReque
 import com.sebin.secondhand_market.domain.product.dto.request.ProductSearchRequest;
 import com.sebin.secondhand_market.domain.product.dto.request.ProductStatusChangeRequest;
 import com.sebin.secondhand_market.domain.product.dto.response.ProductCreatedResponse;
+import com.sebin.secondhand_market.domain.product.dto.response.ProductDetailResponse;
+import com.sebin.secondhand_market.domain.product.dto.response.ProductImageUploadResponse;
 import com.sebin.secondhand_market.domain.product.dto.response.ProductResponse;
+import com.sebin.secondhand_market.domain.product.service.ProductImageService;
 import com.sebin.secondhand_market.domain.product.service.ProductReadService;
 import com.sebin.secondhand_market.domain.product.service.ProductService;
 import com.sebin.secondhand_market.domain.product.type.ProductSortType;
@@ -29,7 +32,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/products")
@@ -38,6 +43,7 @@ public class ProductController {
 
   private final ProductService productService;
   private final ProductReadService productReadService;
+  private final ProductImageService productImageService;
 
   // 상품 등록
   @Operation(summary = "상품 등록")
@@ -122,6 +128,27 @@ public class ProductController {
         .map(ProductResponse::from);
 
     return ResponseEntity.ok(PageResponse.from(responses));
+  }
+
+  // 상품 상세 조회 (이미지 URL 포함)
+  @Operation(summary = "상품 상세 조회")
+  @GetMapping("/{productId}")
+  public ResponseEntity<ProductDetailResponse> detail(@PathVariable UUID productId) {
+    return ResponseEntity.ok(productReadService.getProductDetail(productId));
+  }
+
+  // 상품 이미지 업로드 (본인 상품, 여러 장, 상품당 최대 10장)
+  @Operation(summary = "상품 이미지 업로드")
+  @PostMapping("/{productId}/images")
+  public ResponseEntity<ProductImageUploadResponse> uploadImages(
+      @PathVariable UUID productId,
+      @RequestPart("files") List<MultipartFile> files,
+      @AuthenticationPrincipal UserPrincipal userPrincipal
+  ) {
+    List<String> imageUrls =
+        productImageService.upload(productId, files, userPrincipal.getUserId());
+
+    return ResponseEntity.ok(new ProductImageUploadResponse(productId, imageUrls));
   }
 
 }

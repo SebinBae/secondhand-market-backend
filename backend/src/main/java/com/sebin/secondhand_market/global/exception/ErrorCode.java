@@ -17,6 +17,12 @@ public enum ErrorCode {
   PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품이 존재하지 않습니다."),
   PRODUCT_ACCESS_DENIED(HttpStatus.FORBIDDEN, "상품 수정 권한이 없습니다."),
 
+  IMAGE_INVALID_FORMAT(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 형식입니다. (jpg, png, webp만 허용)"),
+  IMAGE_TOO_LARGE(HttpStatus.BAD_REQUEST, "이미지 크기는 5MB를 초과할 수 없습니다."),
+  IMAGE_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, "상품당 이미지는 최대 10장까지 등록할 수 있습니다."),
+  IMAGE_STORAGE_NOT_CONFIGURED(HttpStatus.SERVICE_UNAVAILABLE, "이미지 저장소가 구성되지 않았습니다."),
+  IMAGE_UPLOAD_FAILED(HttpStatus.BAD_GATEWAY, "이미지 업로드에 실패했습니다."),
+
   BUYER_NOT_FOUND(HttpStatus.NOT_FOUND, "판매자가 존재하지 않습니다."),
   INVALID_CHAT_TARGET(HttpStatus.BAD_REQUEST, "자신의 상품에는 채팅할 수 없습니다."),
   CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "채팅방이 존재하지 않습니다."),

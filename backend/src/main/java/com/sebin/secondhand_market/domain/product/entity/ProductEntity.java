@@ -4,6 +4,7 @@ import com.sebin.secondhand_market.domain.product.type.ProductCategory;
 import com.sebin.secondhand_market.domain.product.type.ProductStatus;
 import com.sebin.secondhand_market.domain.user.entity.UserEntity;
 import com.sebin.secondhand_market.global.common.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,7 +14,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,6 +55,11 @@ public class ProductEntity extends BaseEntity {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 20)
   private ProductStatus productStatus;
+
+  // 상품 이미지 (표시 순서 정렬). 상품 삭제 시 함께 제거된다.
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OrderBy("displayOrder asc")
+  private List<ProductImageEntity> images = new ArrayList<>();
 
   // 기본 생성자
   public ProductEntity(
