@@ -12,6 +12,7 @@ import com.sebin.secondhand_market.domain.user.exception.RefreshTokenReusedExcep
 import com.sebin.secondhand_market.domain.user.exception.UserNotFoundException;
 import com.sebin.secondhand_market.global.security.JwtProvider;
 import com.sebin.secondhand_market.global.security.TokenRedisService;
+import java.util.Optional;
 import java.util.UUID;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,12 @@ public class UserService {
   private final JwtProvider jwtProvider;
   private final TokenRedisService tokenRedisService;
   private final PasswordEncoder passwordEncoder;
+
+  // 타 도메인 공개 조회 창구 — 사용자 단건 조회(not-found 판단은 호출 도메인에 위임)
+  @Transactional(readOnly = true)
+  public Optional<UserEntity> findById(UUID userId) {
+    return userRepository.findById(userId);
+  }
 
   // 회원 등록 로직
   public void signup(@Valid SignupRequest signupRequest) {

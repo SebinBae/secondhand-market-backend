@@ -4,10 +4,9 @@ import com.sebin.secondhand_market.domain.chat.dto.response.ChatRoomResponse;
 import com.sebin.secondhand_market.domain.chat.entity.ChatRoomEntity;
 import com.sebin.secondhand_market.domain.chat.repository.ChatRoomRepository;
 import com.sebin.secondhand_market.domain.product.entity.ProductEntity;
-import com.sebin.secondhand_market.domain.product.repository.ProductRepository;
+import com.sebin.secondhand_market.domain.product.service.ProductReadService;
 import com.sebin.secondhand_market.domain.user.entity.UserEntity;
-import com.sebin.secondhand_market.domain.user.repository.UserRepository;
-import com.sebin.secondhand_market.domain.product.exception.ProductNotFoundException;
+import com.sebin.secondhand_market.domain.user.service.UserService;
 import com.sebin.secondhand_market.domain.chat.exception.BuyerNotFoundException;
 import com.sebin.secondhand_market.domain.chat.exception.InvalidChatTargetException;
 import java.util.List;
@@ -27,19 +26,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatRoomService {
 
   private final ChatRoomRepository chatRoomRepository;
-  private final ProductRepository productRepository;
-  private final UserRepository userRepository;
+  private final ProductReadService productReadService;
+  private final UserService userService;
 
   /**
    * 상품과 구매자 기준 채팅방 생성(이미 존재하면 조회함)
    */
   public ChatRoomResponse createOrGetRoom(UUID productId, UUID buyerId) {
     // 상품 조회
-    ProductEntity product = productRepository.findById(productId)
-        .orElseThrow(ProductNotFoundException::new);
+    ProductEntity product = productReadService.getProductById(productId);
 
     // 구매자 조회
-    UserEntity buyer = userRepository.findById(buyerId)
+    UserEntity buyer = userService.findById(buyerId)
         .orElseThrow(BuyerNotFoundException::new);
 
     // 판매자
