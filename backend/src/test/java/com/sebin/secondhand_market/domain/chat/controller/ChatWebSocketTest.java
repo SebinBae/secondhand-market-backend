@@ -74,7 +74,7 @@ public class ChatWebSocketTest {
     // 1. 유저 생성
     UserEntity seller = userRepository.save(
         new UserEntity(
-            "codus@testtesttest.com",
+            "codus-" + UUID.randomUUID() + "@testtesttest.com",
             "codus",
             "판매자")
     );
@@ -82,7 +82,7 @@ public class ChatWebSocketTest {
 
     UserEntity buyer = userRepository.save(
         new UserEntity(
-            "sedus@testtesttest.com",
+            "sedus-" + UUID.randomUUID() + "@testtesttest.com",
             "sedus",
             "세빈배"
         )

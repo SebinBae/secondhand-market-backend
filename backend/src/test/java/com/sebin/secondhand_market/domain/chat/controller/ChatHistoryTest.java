@@ -70,11 +70,11 @@ public class ChatHistoryTest {
     stompClient = createStompClient();
 
     UserEntity seller = userRepository.save(
-            new UserEntity("history-seller@testtesttest.com", "hseller", "판매자"));
+            new UserEntity("history-seller-" + UUID.randomUUID() + "@testtesttest.com", "hseller", "판매자"));
     sellerId = seller.getId();
 
     UserEntity buyer = userRepository.save(
-            new UserEntity("history-buyer@testtesttest.com", "hbuyer", "구매자"));
+            new UserEntity("history-buyer-" + UUID.randomUUID() + "@testtesttest.com", "hbuyer", "구매자"));
     buyerId = buyer.getId();
 
     ProductEntity product = productRepository.save(

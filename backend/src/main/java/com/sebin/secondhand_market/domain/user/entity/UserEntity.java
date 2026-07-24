@@ -10,8 +10,6 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
@@ -22,8 +20,6 @@ public class UserEntity extends BaseEntity {
 
   @Id
   @GeneratedValue
-  @JdbcTypeCode(SqlTypes.BINARY)
-  @Column(columnDefinition = "BINARY(16)")
   private UUID id;
 
   @Column(nullable = false, unique = true, length = 255)

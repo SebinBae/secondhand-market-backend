@@ -48,18 +48,24 @@ class ProductCreatedEventTest {
   private TxHelper txHelper;
 
   private UUID sellerId;
+  private UUID createdProductId;
 
   @BeforeEach
   void setUp() {
     recorder.clear();
+    createdProductId = null;
+    // 공유 DB에서 다른 테스트와 충돌하지 않도록 이메일을 매번 고유하게 만든다.
     UserEntity seller = userRepository.save(
-        new UserEntity("product-event-seller@test.com", "pw", "판매자"));
+        new UserEntity("product-event-seller-" + UUID.randomUUID() + "@test.com", "pw", "판매자"));
     sellerId = seller.getId();
   }
 
   @AfterEach
   void tearDown() {
-    productRepository.deleteAll();
+    // 이 테스트가 만든 데이터만 정리한다 (deleteAll은 타 테스트의 chat_rooms FK에 걸린다).
+    if (createdProductId != null) {
+      productRepository.deleteById(createdProductId);
+    }
     userRepository.deleteById(sellerId);
     recorder.clear();
   }
@@ -70,6 +76,7 @@ class ProductCreatedEventTest {
     ProductCreateRequest request = request("맥북 프로");
 
     UUID productId = productService.create(request, sellerId);
+    createdProductId = productId;
 
     List<ProductCreatedEvent> received = recorder.events();
     assertThat(received).hasSize(1);
@@ -84,12 +91,14 @@ class ProductCreatedEventTest {
   @DisplayName("상품 등록 트랜잭션이 롤백되면 이벤트가 수신되지 않는다")
   void doesNotPublishEventWhenRolledBack() {
     ProductCreateRequest request = request("롤백될 상품");
+    long countBefore = productRepository.count();
 
     assertThatThrownBy(() -> txHelper.createThenRollback(request, sellerId))
         .isInstanceOf(IllegalStateException.class);
 
     assertThat(recorder.events()).isEmpty();
-    assertThat(productRepository.count()).isZero();
+    // 전역 0이 아니라 델타로 검증 — 공유 DB에 다른 테스트 데이터가 있을 수 있다.
+    assertThat(productRepository.count()).isEqualTo(countBefore);
   }
 
   private ProductCreateRequest request(String title) {
